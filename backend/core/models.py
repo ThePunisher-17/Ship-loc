@@ -70,15 +70,15 @@ class Location(models.Model):
 
 
 class Fleet(models.Model):
-    STATUS_CHOICES = [
-        ('Expected', 'Expected'),
-        ('Arrived', 'Arrived'),
-        ('Unloading', 'Unloading'),
-        ('Reconciled', 'Reconciled'),
-    ]
+    class Status(models.TextChoices):
+        EXPECTED   = 'Expected',   'Expected'
+        ARRIVED    = 'Arrived',    'Arrived'
+        UNLOADING  = 'Unloading',  'Unloading'
+        RECONCILED = 'Reconciled', 'Reconciled'
+
     fleet_id = models.CharField(max_length=100, primary_key=True)
     origin_hub = models.CharField(max_length=100)
-    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Expected')
+    status = models.CharField(max_length=50, choices=Status.choices, default=Status.EXPECTED)
     arrival_timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -102,24 +102,25 @@ class Order(models.Model):
 
 
 class ShipmentBox(models.Model):
-    STATUS_CHOICES = [
-        ('In-Transit', 'In-Transit'),
-        ('Unloaded', 'Unloaded'),
-        ('Stored', 'Stored'),
-        ('Retrieved', 'Retrieved'),
-        ('Dispatched', 'Dispatched'),
-    ]
-    tracking_number = models.CharField(max_length=100, primary_key=True)
-    fleet = models.ForeignKey(Fleet, on_delete=models.PROTECT, related_name='boxes')
-    order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name='boxes')
-    route = models.ForeignKey(Route, null=True, blank=True, on_delete=models.SET_NULL, related_name='boxes')
-    location = models.ForeignKey(Location, null=True, blank=True, on_delete=models.SET_NULL, related_name='boxes')
-    box_sequence = models.CharField(max_length=20)  # e.g. "1 of 3"
-    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='In-Transit')
+    class Status(models.TextChoices):
+        IN_TRANSIT = 'In-Transit', 'In-Transit'
+        UNLOADED   = 'Unloaded',   'Unloaded'
+        STORED     = 'Stored',     'Stored'
+        RETRIEVED  = 'Retrieved',  'Retrieved'
+        DISPATCHED = 'Dispatched', 'Dispatched'
 
-    # Timestamps for KPI tracking
+    tracking_number = models.CharField(max_length=100, primary_key=True)
+    fleet    = models.ForeignKey(Fleet,    on_delete=models.PROTECT,  related_name='boxes')
+    order    = models.ForeignKey(Order,    on_delete=models.PROTECT,  related_name='boxes')
+    route    = models.ForeignKey(Route,    null=True, blank=True, on_delete=models.SET_NULL, related_name='boxes')
+    location = models.ForeignKey(Location, null=True, blank=True, on_delete=models.SET_NULL, related_name='boxes')
+    box_sequence = models.CharField(max_length=20)
+    status = models.CharField(max_length=50, choices=Status.choices, default=Status.IN_TRANSIT)
+
+    # Timestamps for KPI / TAT tracking
     unloaded_at = models.DateTimeField(null=True, blank=True)
     stored_at = models.DateTimeField(null=True, blank=True)
+    retrieved_at = models.DateTimeField(null=True, blank=True)
     dispatched_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:

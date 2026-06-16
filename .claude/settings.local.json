@@ -17,7 +17,13 @@
       "Bash(curl -sv http://localhost:8000/api/v1/locations/)",
       "Bash(curl -s http://localhost:8000/api/v1/boxes/)",
       "Bash(python3 -c \"import sys; body=sys.stdin.read\\(\\); import re; m=re.search\\(r'Exception Type.*?<\\\\/pre>', body, re.DOTALL\\); print\\(m.group\\(\\) if m else body[:500]\\)\")",
-      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('boxes returned:', len\\(d.get\\('results',[]\\)\\)\\)\")"
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('boxes returned:', len\\(d.get\\('results',[]\\)\\)\\)\")",
+      "Bash(curl -s -X POST http://localhost:8000/api/v1/boxes/TRK-B001/retrieve/)",
+      "Bash(make *)",
+      "Bash(curl -s http://localhost:8000/api/v1/stats/)",
+      "Bash(curl -s http://localhost:8000/api/v1/boxes/?status=Unloaded)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); b=d['results'][0] if d['results'] else {}; print\\('minutes_unloaded:', b.get\\('minutes_unloaded'\\)\\); print\\('order_address:', b.get\\('order_address'\\)\\)\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('OK — boxes returned:', len\\(d['results']\\)\\)\")"
     ]
   }
 }

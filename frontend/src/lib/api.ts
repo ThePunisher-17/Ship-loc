@@ -1,4 +1,4 @@
-import type { Fleet, ShipmentBox, Location, Route, ScanUnloadResponse, ScanStoreResponse } from '@/types';
+import type { Fleet, ShipmentBox, Location, Route, Order, User, Stats, ScanUnloadResponse, ScanStoreResponse } from '@/types';
 
 const BASE =
   (typeof window === 'undefined'
@@ -18,11 +18,21 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  // Stats
+  getStats: () => request<Stats>('/stats/'),
+
+  // Users
+  getUsers: (params?: Record<string, string>) => {
+    const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<{ results: User[] }>(`/users/${qs}`);
+  },
+
   // Fleets
-  getFleets: () => request<{ results: Fleet[] }>('/fleets/'),
-  getFleet: (id: string) => request<Fleet>(`/fleets/${id}/`),
-  markArrived: (id: string) => request<Fleet>(`/fleets/${id}/mark_arrived/`, { method: 'POST' }),
-  startUnloading: (id: string) => request<Fleet>(`/fleets/${id}/start_unloading/`, { method: 'POST' }),
+  getFleets:       ()        => request<{ results: Fleet[] }>('/fleets/'),
+  getFleet:        (id: string) => request<Fleet>(`/fleets/${id}/`),
+  markArrived:     (id: string) => request<Fleet>(`/fleets/${id}/mark_arrived/`,    { method: 'POST' }),
+  startUnloading:  (id: string) => request<Fleet>(`/fleets/${id}/start_unloading/`, { method: 'POST' }),
+  reconcileFleet:  (id: string) => request<Fleet>(`/fleets/${id}/reconcile/`,       { method: 'POST' }),
 
   // Boxes
   getBoxes: (params?: Record<string, string>) => {
@@ -39,6 +49,8 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ tracking_number, scanned_location_id, staff_user_id }),
     }),
+  retrieve: (tracking_number: string) =>
+    request<ShipmentBox>(`/boxes/${tracking_number}/retrieve/`, { method: 'POST' }),
   dispatch: (tracking_number: string) =>
     request<ShipmentBox>(`/boxes/${tracking_number}/confirm_dispatch/`, { method: 'POST' }),
 
@@ -49,6 +61,12 @@ export const api = {
   },
 
   // Routes
-  getRoutes: () => request<{ results: Route[] }>('/routes/'),
+  getRoutes:        ()        => request<{ results: Route[] }>('/routes/'),
   getRouteManifest: (id: string) => request<ShipmentBox[]>(`/routes/${id}/manifest/`),
+
+  // Orders
+  getOrders: (params?: Record<string, string>) => {
+    const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<{ results: Order[] }>(`/orders/${qs}`);
+  },
 };

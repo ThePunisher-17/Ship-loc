@@ -12,4 +12,5 @@ router.register(r'boxes', views.ShipmentBoxViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('stats/', views.stats),
 ]

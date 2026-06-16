@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { NavLink } from '@/components/NavLink';
+import { ToastProvider } from '@/lib/toast';
 
 export const metadata: Metadata = {
   title: 'WarehouseOS',
@@ -13,6 +14,8 @@ const NAV = [
   { href: '/scan',      label: 'Scan',       icon: '⬡'  },
   { href: '/locations', label: 'Locations',  icon: '⊞'  },
   { href: '/routes',    label: 'Routes',     icon: '⤢'  },
+  { href: '/orders',    label: 'Orders',     icon: '📋' },
+  { href: '/users',     label: 'Staff',      icon: '👤' },
 ];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -24,13 +27,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <p className="font-bold text-white text-base tracking-tight">WarehouseOS</p>
             <p className="text-slate-500 text-xs mt-0.5">Logistics Command Center</p>
           </div>
-
-          <nav className="flex-1 p-3 space-y-0.5 mt-1">
-            {NAV.map(n => (
-              <NavLink key={n.href} {...n} />
-            ))}
+          <nav className="flex-1 p-3 space-y-0.5 mt-1 overflow-y-auto">
+            {NAV.map(n => <NavLink key={n.href} {...n} />)}
           </nav>
-
           <div className="p-4 border-t border-slate-700/60">
             <div className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold">A</div>
@@ -41,9 +40,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </div>
         </aside>
-
         <div className="ml-56 flex-1 flex flex-col min-h-screen">
-          <main className="flex-1 p-6 max-w-7xl">{children}</main>
+          <ToastProvider>
+            <main className="flex-1 p-6 max-w-7xl">{children}</main>
+          </ToastProvider>
         </div>
       </body>
     </html>
