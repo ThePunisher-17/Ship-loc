@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker compose *)",
+      "Bash(curl -s http://localhost:8000/api/v1/)",
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(curl -s http://localhost:8000/api/v1/fleets/)",
+      "Bash(python3 -m json.tool)",
+      "Bash(xargs cat)",
+      "Bash(curl -s \"http://localhost:8000/api/v1/boxes/\")",
+      "Bash(curl -s \"http://localhost:8000/api/v1/locations/?limit=100\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('count:', d.get\\('count'\\), 'results:', len\\(d.get\\('results',[]\\)\\)\\)\")",
+      "Bash(curl -s http://localhost:8000/api/v1/locations/)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('locations returned:', len\\(d.get\\('results',[]\\)\\)\\)\")",
+      "Bash(curl -sv http://localhost:8000/api/v1/fleets/)",
+      "Bash(curl -sv http://localhost:8000/api/v1/boxes/)",
+      "Bash(curl -sv http://localhost:8000/api/v1/locations/)",
+      "Bash(curl -s http://localhost:8000/api/v1/boxes/)",
+      "Bash(python3 -c \"import sys; body=sys.stdin.read\\(\\); import re; m=re.search\\(r'Exception Type.*?<\\\\/pre>', body, re.DOTALL\\); print\\(m.group\\(\\) if m else body[:500]\\)\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('boxes returned:', len\\(d.get\\('results',[]\\)\\)\\)\")"
+    ]
+  }
+}

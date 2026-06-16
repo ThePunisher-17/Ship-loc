@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:14
+    container_name: warehouse_db
+    restart: always
+    environment:
+      POSTGRES_USER: warehouse_admin
+      POSTGRES_PASSWORD: securepassword123
+      POSTGRES_DB: warehouse_core
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U warehouse_admin -d warehouse_core"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+    container_name: warehouse_backend
+    restart: always
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py seed_db &&
+             DJANGO_SUPERUSER_PASSWORD=admin123 python manage.py createsuperuser --noinput --username admin --email admin@warehouse.local 2>/dev/null || true &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DB_HOST=db
+      - DB_NAME=warehouse_core
+      - DB_USER=warehouse_admin
+      - DB_PASSWORD=securepassword123
+      - DB_PORT=5432
+      - DJANGO_SECRET_KEY=dev-secret-key-change-in-production
+      - DEBUG=True
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: warehouse_frontend
+    restart: always
+    command: npm run dev
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+      - INTERNAL_API_URL=http://backend:8000/api/v1
+
+volumes:
+  postgres_data:
